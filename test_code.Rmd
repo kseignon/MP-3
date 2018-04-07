@@ -8,15 +8,17 @@ library(sf)
 library(dplyr)
 #install.packages("macleish")
 library(macleish)
+```
+
+```{r}
 names(macleish_layers)
 trails <- (macleish_layers[["trails"]])
 names(macleish_layers[["forests"]])
 filter(trails, names)
 ```
 
-
+Try filtering by length
 ```{r}
-(macleish_layers[["trails"]]) %>%
-  group_by(name)
+
 ```
 
