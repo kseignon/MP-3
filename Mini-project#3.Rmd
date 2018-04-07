@@ -7,6 +7,29 @@ output: html_document
 ```{r}
 library(sf)
 library(dplyr)
-#install.packages("macleish") 
+install.packages("macleish") 
+```
+```{r}
+library(macleish)
+```
+```{r}
+names(macleish_layers)
+```
+```{r}
+macleish_layers[["trails"]]
+```
+```{r}
+macleish_layers[["landmarks"]]
+```
+```{r}
+??macleish_layers
+```
+```{r}
+macleish_layers[["trails"]] %>%
+  st_length()
+```
+```{r}
+trails <- macleish_layers[["trails"]] %>%
+  mutate(computed_length = st_length(geometry))
 ```
 
