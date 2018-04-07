@@ -1,0 +1,43 @@
+---
+title: "MP#3"
+author: "Kareen Seignon"
+date: "4/7/2018"
+output: html_document
+---
+
+---
+title: "Mini-project#3"
+author: "Kareen Seignon"
+date: "4/15/2018"
+output: html_document
+---
+#library
+```{r}
+library(sf)
+library(dplyr)
+install.packages("macleish") 
+```
+```{r}
+library(macleish)
+```
+```{r}
+names(macleish_layers)
+```
+```{r}
+macleish_layers[["trails"]]
+```
+```{r}
+macleish_layers[["landmarks"]]
+```
+```{r}
+??macleish_layers
+```
+```{r}
+macleish_layers[["trails"]] %>%
+  st_length()
+```
+```{r}
+trails <- macleish_layers[["trails"]] %>%
+  mutate(computed_length = st_length(geometry))
+```
+
