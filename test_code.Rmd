@@ -6,19 +6,22 @@ output: html_document
 ```{r}
 library(sf)
 library(dplyr)
-#install.packages("macleish")
+install.packages("macleish")
 library(macleish)
 ```
 
 ```{r}
 names(macleish_layers)
-trails <- (macleish_layers[["trails"]])
+(macleish_layers[["trails"]])
 names(macleish_layers[["forests"]])
 filter(trails, names)
+#group_by(name)
+#summarize(length)
 ```
 
 Try filtering by length
 ```{r}
-
+trails <- macleish_layers[["trails"]] %>%
+  mutate(length = st_length(geometry))
 ```
 
