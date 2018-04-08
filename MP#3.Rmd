@@ -2,7 +2,9 @@
 title: "MP#3"
 author: "Kareen Seignon"
 date: "4/7/2018"
-output: html_document
+output: 
+ html_document:
+   code_folding: hide 
 ---
 
 ```{r}
