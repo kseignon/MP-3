@@ -2,16 +2,10 @@
 title: "MP#3"
 author: "Kareen Seignon"
 date: "4/7/2018"
-output: html_document
+output: 
+ html_document:
+   code_folding: hide 
 ---
-
----
-title: "Mini-project#3"
-author: "Kareen Seignon"
-date: "4/15/2018"
-output: html_document
----
-#library
 
 ```{r}
 library(sf)
@@ -28,10 +22,10 @@ names(macleish_layers)
 macleish_layers[["trails"]]
 ```
 ```{r}
-macleish_layers[["landmarks"]]
+??macleish_layers
 ```
 ```{r}
-??macleish_layers
+nrow(trails)
 ```
 ```{r}
 macleish_layers[["trails"]] %>%
@@ -42,4 +36,25 @@ macleish_layers[["trails"]] %>%
 trails <- macleish_layers[["trails"]] %>%
   mutate(computed_length = st_length(geometry))
 ```
+```{r}
+trails %>% 
+group_by(name) %>% 
+summarise(Num_segments = n(), 
+          total_length = sum(computed_length)) %>%
+arrange(total_length)
+```
+```{r}
+trails_4326 <- trails %>%
+  st_transform(4326)
+trails_4326
+```
+```{r}
+library(leaflet)
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = trails_4326)
+```
+
+
+
 
