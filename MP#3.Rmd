@@ -53,7 +53,29 @@ leaflet() %>%
   addTiles() %>%
   addPolylines(data = trails_4326)
 ```
+```{r}
+url <- "http://download.massgis.digital.mass.gov/shapefiles/state/contours250k.zip"
+local_file <- basename(url)
+download.file(url, destfile = local_file)
+unzip(local_file, exdir = "contours")
+```
+```{r}
+library(sf)
+dsn <- path.expand("contours")
+dsn
+list.files(dsn)
+```
+```{r}
+st_layers(dsn)
+```
+```{r}
+contours_elevation <- read_sf(dsn)
+contours_elevation
+```
 
+```{r}
+names (contours_elevation)
+```
 
 
 
