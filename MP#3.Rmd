@@ -16,11 +16,11 @@ output: html_document
 ```{r}
 library(sf)
 library(dplyr)
-install.packages("macleish") 
-```
-```{r}
+#install.packages("macleish") 
+library(tidyverse)
 library(macleish)
 ```
+
 ```{r}
 names(macleish_layers)
 ```
@@ -37,6 +37,7 @@ macleish_layers[["landmarks"]]
 macleish_layers[["trails"]] %>%
   st_length()
 ```
+
 ```{r}
 trails <- macleish_layers[["trails"]] %>%
   mutate(computed_length = st_length(geometry))
