@@ -33,3 +33,80 @@ trails <- test_trail %>%
   mutate(length = st_length(geometry))
 ```
 
+#### Work so far on MP#:
+
+```{r}
+library(sf)
+library(dplyr)
+#install.packages("macleish") 
+library(tidyverse)
+library(macleish)
+```
+
+```{r}
+names(macleish_layers)
+```
+```{r}
+macleish_layers[["trails"]]
+```
+```{r}
+??macleish_layers
+```
+```{r}
+nrow(trails)
+```
+```{r}
+macleish_layers[["trails"]] %>%
+  st_length()
+```
+
+```{r}
+trails <- st_as_sf(macleish_layers[["trails"]]) %>% #this line is different
+  mutate(computed_length = st_length(geometry))
+```
+```{r}
+trails %>% 
+group_by(name) %>% 
+summarise(Num_segments = n(), 
+          total_length = sum(computed_length)) %>%
+arrange(total_length)
+```
+```{r}
+trails_4326 <- trails %>%
+  st_transform(4326)
+trails_4326
+```
+```{r}
+library(leaflet)
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = trails_4326)
+```
+```{r}
+url <- "http://download.massgis.digital.mass.gov/shapefiles/state/contours250k.zip"
+local_file <- basename(url)
+download.file(url, destfile = local_file)
+unzip(local_file, exdir = "contours")
+```
+```{r}
+library(sf)
+dsn <- path.expand("contours")
+dsn
+list.files(dsn)
+```
+```{r}
+st_layers(dsn)
+```
+```{r}
+contours_elevation <- read_sf(dsn)
+contours_elevation
+```
+
+```{r}
+names (contours_elevation)
+```
+
+
+
+
+
