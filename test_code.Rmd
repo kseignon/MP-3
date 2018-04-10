@@ -18,11 +18,18 @@ filter(trails, names)
 #group_by(name)
 #summarize(length)
 class(macleish_layers[["trails"]])
+test_trail <- st_as_sf(macleish_layers[["trails"]])
+#trails2 <- st_set_geometry(macleish_layers[["trails"]], NULL)
 ```
+
+Using: http://adamwilson.us/RDataScience/04_Spatial_with_sf.html
 
 Try filtering by length
 ```{r}
 trails <- macleish_layers[["trails"]] %>%
+  mutate(length = st_length(geometry))
+
+trails <- test_trail %>%
   mutate(length = st_length(geometry))
 ```
 
