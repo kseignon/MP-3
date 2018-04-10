@@ -106,6 +106,17 @@ contours_elevation
 names (contours_elevation)
 ```
 
+i wanna see the contour lines...
+Check crs and projections...
+```{r}
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = contours_elevation)
+
+class(contours_elevation)
+crs(contours_elevation)
+st_transform(contours_elevation)
+```
 
 
 
