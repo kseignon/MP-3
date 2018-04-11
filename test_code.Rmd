@@ -78,20 +78,26 @@ contours_elevation
 names (contours_elevation)
 ```
 
-i wanna see the contour lines...
 Check crs and projections...
 ```{r}
-leaflet() %>%
-  addTiles() %>%
-  addPolylines(data = contours_4326)
+#leaflet() %>%
+#  addTiles() %>%
+#  addPolylines(data = contours_4326)
 
 st_crs(contours_elevation)
 contours_4326 <- st_transform(contours_elevation, 4326)
 st_crs(contours_4326)
 ```
 
+Restrict contours to macleish
 ```{r}
 Boundary_contours[[1]] <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
+
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = macleish_layers[["boundary"]])%>%
+  addPolylines(data = Boundary_contours) %>%
+  addPolylines(data = macleish_layers[["trails"]], color= "brown")
 ```
 
 
