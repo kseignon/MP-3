@@ -84,4 +84,4 @@ leaflet() %>%
 
 ```
 
-
+#for each geometry set in the linestring, match with contour line geometry to give FT?
