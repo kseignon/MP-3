@@ -85,15 +85,13 @@ leaflet() %>%
   addTiles() %>%
   addPolylines(data = contours_4326)
 
-class(contours_elevation)
 st_crs(contours_elevation)
 contours_4326 <- st_transform(contours_elevation, 4326)
 st_crs(contours_4326)
 ```
 
 ```{r}
-Boundary_contours <-st_as_sf(macleish_layers[["boundary"]]) %>%
-  st_intersection(contours_4326)
+Boundary_contours[[1]] <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
 ```
 
 
