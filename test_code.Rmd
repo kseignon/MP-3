@@ -6,7 +6,7 @@ output: html_document
 ```{r}
 library(sf)
 library(dplyr)
-install.packages("macleish")
+#install.packages("macleish")
 library(macleish)
 ```
 
@@ -111,13 +111,17 @@ Check crs and projections...
 ```{r}
 leaflet() %>%
   addTiles() %>%
-  addPolylines(data = contours_elevation)
+  addPolylines(data = contours_4326)
 
 class(contours_elevation)
-crs(contours_elevation)
-st_transform(contours_elevation)
+st_crs(contours_elevation)
+contours_4326 <- st_transform(contours_elevation, 4326)
+st_crs(contours_4326)
 ```
 
-
+```{r}
+Boundary_contours <-st_as_sf(macleish_layers[["boundary"]]) %>%
+  st_intersection(contours_4326)
+```
 
 
