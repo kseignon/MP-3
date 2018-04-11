@@ -6,6 +6,7 @@ output: html_document
 ```{r}
 library(sf)
 library(dplyr)
+# devtools::install_github("beanumber/macleish")
 #install.packages("macleish")
 library(macleish)
 ```
