@@ -100,4 +100,18 @@ leaflet() %>%
   addPolylines(data = macleish_layers[["trails"]], color= "brown")
 ```
 
+Test with just "Porcupine Trail:"
+```{r}
+porcupine <- st_as_sf(macleish_layers[["trails"]]) %>%
+  filter(name == "Porcupine Trail") %>%
+  mutate(computed_length = st_length(geometry))
+
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = macleish_layers[["boundary"]])%>%
+  addPolylines(data = Boundary_contours) %>%
+  addPolylines(data = porcupine, color= "brown")
+
+```
+
 
