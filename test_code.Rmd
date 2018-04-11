@@ -9,16 +9,10 @@ library(dplyr)
 # devtools::install_github("beanumber/macleish")
 #install.packages("macleish")
 library(macleish)
+library(tidyverse)
 ```
 
 ```{r}
-names(macleish_layers)
-(macleish_layers[["trails"]])
-names(macleish_layers[["forests"]])
-filter(trails, names)
-#group_by(name)
-#summarize(length)
-class(macleish_layers[["trails"]])
 test_trail <- st_as_sf(macleish_layers[["trails"]])
 #trails2 <- st_set_geometry(macleish_layers[["trails"]], NULL)
 ```
@@ -27,35 +21,12 @@ Using: http://adamwilson.us/RDataScience/04_Spatial_with_sf.html
 
 Try filtering by length
 ```{r}
-trails <- macleish_layers[["trails"]] %>%
-  mutate(length = st_length(geometry))
-
 trails <- test_trail %>%
   mutate(length = st_length(geometry))
 ```
 
 #### Work so far on MP#:
 
-```{r}
-library(sf)
-library(dplyr)
-#install.packages("macleish") 
-library(tidyverse)
-library(macleish)
-```
-
-```{r}
-names(macleish_layers)
-```
-```{r}
-macleish_layers[["trails"]]
-```
-```{r}
-??macleish_layers
-```
-```{r}
-nrow(trails)
-```
 ```{r}
 macleish_layers[["trails"]] %>%
   st_length()
