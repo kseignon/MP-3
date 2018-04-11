@@ -104,7 +104,7 @@ Test with just "Porcupine Trail:"
 ```{r}
 porcupine <- st_as_sf(macleish_layers[["trails"]]) %>%
   filter(name == "Porcupine Trail") %>%
-  mutate(computed_length = st_length(geometry)) %>%
+  mutate(computed_length = st_length(geometry)) 
 
 leaflet() %>%
   addTiles() %>%

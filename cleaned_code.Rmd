@@ -10,6 +10,7 @@ library(dplyr)
 #install.packages("macleish")
 library(macleish)
 library(tidyverse)
+library(leaflet)
 ```
 
 Add length column:
@@ -60,7 +61,7 @@ st_crs(contours_4326)
 
 Restrict contours to macleish
 ```{r}
-#Boundary_contours <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
+Boundary_contours <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
 
 leaflet() %>%
   addTiles() %>%
@@ -73,7 +74,7 @@ Test with just "Porcupine Trail:"
 ```{r}
 porcupine <- st_as_sf(macleish_layers[["trails"]]) %>%
   filter(name == "Porcupine Trail") %>%
-  mutate(computed_length = st_length(geometry)) %>%
+  mutate(computed_length = st_length(geometry)) 
 
 leaflet() %>%
   addTiles() %>%
