@@ -1,8 +1,8 @@
 ---
-title: "Test_code"
-author: "Julia Portocarrero"
+title: "cleaned_code"
 output: html_document
 ---
+
 ```{r}
 library(sf)
 library(dplyr)
@@ -12,30 +12,7 @@ library(macleish)
 library(tidyverse)
 ```
 
-```{r}
-test_trail <- st_as_sf(macleish_layers[["trails"]])
-#trails2 <- st_set_geometry(macleish_layers[["trails"]], NULL)
-```
-
-Using: http://adamwilson.us/RDataScience/04_Spatial_with_sf.html
-
-Try filtering by length
-```{r}
-trails <- test_trail %>%
-  mutate(length = st_length(geometry))
-```
-
-#### Work so far on MP#:
-
-```{r}
-macleish_layers[["trails"]] %>%
-  st_length()
-```
-
-```{r}
-trails <- st_as_sf(macleish_layers[["trails"]]) %>% #this line is different
-  mutate(computed_length = st_length(geometry))
-```
+Add length column:
 ```{r}
 trails %>% 
 group_by(name) %>% 
@@ -43,47 +20,39 @@ summarise(Num_segments = n(),
           total_length = sum(computed_length)) %>%
 arrange(total_length)
 ```
+
+Change crs of trails: Maybe not needed??
 ```{r}
 trails_4326 <- trails %>%
   st_transform(4326)
 trails_4326
 ```
+
+Test drawing trails:
 ```{r}
 library(leaflet)
 leaflet() %>%
   addTiles() %>%
   addPolylines(data = trails_4326)
 ```
+
+Get contour data:
 ```{r}
 url <- "http://download.massgis.digital.mass.gov/shapefiles/state/contours250k.zip"
 local_file <- basename(url)
 download.file(url, destfile = local_file)
 unzip(local_file, exdir = "contours")
 ```
+
+Make contours_elevation file
 ```{r}
 library(sf)
 dsn <- path.expand("contours")
-dsn
-list.files(dsn)
-```
-```{r}
-st_layers(dsn)
-```
-```{r}
 contours_elevation <- read_sf(dsn)
-contours_elevation
-```
-
-```{r}
-names (contours_elevation)
 ```
 
 Check crs and projections...
 ```{r}
-#leaflet() %>%
-#  addTiles() %>%
-#  addPolylines(data = contours_4326)
-
 st_crs(contours_elevation)
 contours_4326 <- st_transform(contours_elevation, 4326)
 st_crs(contours_4326)
@@ -91,7 +60,7 @@ st_crs(contours_4326)
 
 Restrict contours to macleish
 ```{r}
-Boundary_contours[[1]] <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
+#Boundary_contours <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
 
 leaflet() %>%
   addTiles() %>%
