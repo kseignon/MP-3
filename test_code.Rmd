@@ -62,7 +62,7 @@ contours_4326 <- st_transform(contours_elevation, 4326)
 st_crs(contours_4326)
 ```
 
-Restrict contours to macleish and plot with trails:
+Restrict contours to macleish and plot with all trails:
 ```{r}
 Boundary_contours[[1]] <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
 
@@ -91,29 +91,32 @@ st_intersection(porcupine, Boundary_contours) %>%
 ```
 
 
-Try plotting all trails: Fails
+Function to make df for all trails, that has min and max:
 ```{r}
 #function to take plot all trails
-plot_trail_fun <- function(data1, trail_name) {
-  table <- st_as_sf(data1) %>%
-  filter(name == trail_name)
+trail_data_fun <- function(data1, trail_name) {
   
-  plot1 <- leaflet() %>%
-    addTiles() %>%
-    addPolylines(data = macleish_layers[["boundary"]]) %>%
-    addPolylines(data = Boundary_contours) %>%
-    addPolylines(data = table, color= "brown")
+  #filter the trail data
+  trail_data <- st_as_sf(data1) %>%
+  filter(name == trail_name) %>%
+  #group_by(name) %>%
+  mutate(computed_length = st_length(geometry))
   
-  return(plot1)
+  #intersect with contour data
+  new_df <- st_intersection(trail_data, Boundary_contours) %>%
+  group_by(name) %>%
+  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = avg(computed_length))
+  
+  return(new_df)
 }
 
 trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
 
 #test function
-plot_trail_fun(macleish_layers[["trails"]], "Porcupine Trail")
+trail_data_fun(macleish_layers[["trails"]], "Porcupine Trail")
 
 #try with all trails:
-lapply(data1 = macleish_layers[["trails"]], trail_names, plot_trail_fun)
+lapply(data1 = macleish_layers[["trails"]], trail_names, trail_data_fun)
 
 ```
 
