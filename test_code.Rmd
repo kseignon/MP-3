@@ -105,7 +105,7 @@ trail_data_fun <- function(data1, trail_name) {
   #intersect with contour data
   new_df <- st_intersection(trail_data, Boundary_contours) %>%
   group_by(name) %>%
-  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = avg(computed_length))
+  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = sum(computed_length))
   
   return(new_df)
 }
