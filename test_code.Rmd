@@ -105,13 +105,16 @@ Test with just "Porcupine Trail"
 ```{r}
 porcupine <- st_as_sf(macleish_layers[["trails"]]) %>%
   filter(name == "Porcupine Trail") %>%
-  #mutate(computed_length = st_length(geometry)) 
+  mutate(computed_length = st_length(geometry)) 
 
 leaflet() %>%
   addTiles() %>%
   addPolylines(data = macleish_layers[["boundary"]])%>%
   addPolylines(data = Boundary_contours) %>%
   addPolylines(data = porcupine, color= "brown")
+
+st_intersection(porcupine, Boundary_contours) %>%
+  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = computed_length)
 
 trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
 ```
@@ -144,6 +147,8 @@ lapply(data1 = macleish_layers[["trails"]], trail_names, plot_trail_fun)
 
 Try with colors: Error
 ```{r}
+library(colorspace)
+
 factpal <- colorFactor((rainbow_hcl(n = 9, c = 50, l = 70, start = 1, end = 320)), trails$name, TRUE)
 
 
