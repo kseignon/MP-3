@@ -10,6 +10,7 @@ library(dplyr)
 #install.packages("macleish")
 library(macleish)
 library(tidyverse)
+library(leaflet)
 ```
 
 ```{r}
@@ -100,11 +101,11 @@ leaflet() %>%
   addPolylines(data = macleish_layers[["trails"]], color= "brown")
 ```
 
-Test with just "Porcupine Trail:"
+Test with just "Porcupine Trail"
 ```{r}
 porcupine <- st_as_sf(macleish_layers[["trails"]]) %>%
   filter(name == "Porcupine Trail") %>%
-  mutate(computed_length = st_length(geometry)) 
+  #mutate(computed_length = st_length(geometry)) 
 
 leaflet() %>%
   addTiles() %>%
@@ -112,6 +113,43 @@ leaflet() %>%
   addPolylines(data = Boundary_contours) %>%
   addPolylines(data = porcupine, color= "brown")
 
+trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
+```
+
+```{r}
+#function to take plot all trails
+plot_trail_fun <- function(data1, trail_name) {
+  table <- st_as_sf(data1) %>%
+  filter(name == trail_name)
+  
+  plot1 <- leaflet() %>%
+    addTiles() %>%
+    addPolylines(data = macleish_layers[["boundary"]]) %>%
+    addPolylines(data = Boundary_contours) %>%
+    addPolylines(data = table, color= "brown")
+  
+  return(plot1)
+}
+
+#test function
+plot_trail_fun(macleish_layers[["trails"]], "Porcupine Trail")
+
+#try with all trails:
+lapply(data1 = macleish_layers[["trails"]], trail_names, plot_trail_fun)
+
+```
+
+
+
+Try with colors: Error
+```{r}
+factpal <- colorFactor((rainbow_hcl(n = 15, c = 50, l = 70, start = 0, end = 360)), trails$name, TRUE)
+
+leaflet() %>%
+ addTiles() %>%
+ addPolylines(data = macleish_layers[["boundary"]])%>%
+ addPolylines(data = Boundary_contours) %>%
+ addPolylines(data = macleish_layers[["trails"]], color= ~factpal(name))
 ```
 
 
