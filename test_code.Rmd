@@ -116,6 +116,8 @@ leaflet() %>%
 trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
 ```
 
+
+Try plotting all trails: only plots last one
 ```{r}
 #function to take plot all trails
 plot_trail_fun <- function(data1, trail_name) {
@@ -140,10 +142,10 @@ lapply(data1 = macleish_layers[["trails"]], trail_names, plot_trail_fun)
 ```
 
 
-
 Try with colors: Error
 ```{r}
-factpal <- colorFactor((rainbow_hcl(n = 15, c = 50, l = 70, start = 0, end = 360)), trails$name, TRUE)
+factpal <- colorFactor((rainbow_hcl(n = 9, c = 50, l = 70, start = 1, end = 320)), trails$name, TRUE)
+
 
 leaflet() %>%
  addTiles() %>%
