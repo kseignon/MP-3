@@ -28,63 +28,35 @@ trails <- test_trail %>%
 
 #### Work so far on MP#:
 
+Find length:
 ```{r}
-macleish_layers[["trails"]] %>%
-  st_length()
-```
-
-```{r}
-trails <- st_as_sf(macleish_layers[["trails"]]) %>% #this line is different
+trails <- st_as_sf(macleish_layers[["trails"]]) %>% 
   mutate(computed_length = st_length(geometry))
-```
-```{r}
-trails %>% 
-group_by(name) %>% 
-summarise(Num_segments = n(), 
-          total_length = sum(computed_length)) %>%
-arrange(total_length)
-```
-```{r}
+
 trails_4326 <- trails %>%
   st_transform(4326)
 trails_4326
 ```
-```{r}
-library(leaflet)
-leaflet() %>%
-  addTiles() %>%
-  addPolylines(data = trails_4326)
-```
+
+Get contour data:
 ```{r}
 url <- "http://download.massgis.digital.mass.gov/shapefiles/state/contours250k.zip"
 local_file <- basename(url)
 download.file(url, destfile = local_file)
 unzip(local_file, exdir = "contours")
-```
-```{r}
+
 library(sf)
 dsn <- path.expand("contours")
 dsn
 list.files(dsn)
-```
-```{r}
-st_layers(dsn)
-```
-```{r}
-contours_elevation <- read_sf(dsn)
-contours_elevation
-```
 
-```{r}
+st_layers(dsn)
+contours_elevation <- read_sf(dsn)
 names (contours_elevation)
 ```
 
 Check crs and projections...
 ```{r}
-#leaflet() %>%
-#  addTiles() %>%
-#  addPolylines(data = contours_4326)
-
 st_crs(contours_elevation)
 contours_4326 <- st_transform(contours_elevation, 4326)
 st_crs(contours_4326)
@@ -107,6 +79,11 @@ porcupine <- st_as_sf(macleish_layers[["trails"]]) %>%
   filter(name == "Porcupine Trail") %>%
   mutate(computed_length = st_length(geometry)) 
 
+entry <- st_as_sf(macleish_layers[["trails"]]) %>%
+  filter(name == "entry trail") %>%
+  group_by(name) %>%
+  mutate(computed_length = st_length(geometry)) 
+
 leaflet() %>%
   addTiles() %>%
   addPolylines(data = macleish_layers[["boundary"]])%>%
@@ -114,13 +91,13 @@ leaflet() %>%
   addPolylines(data = porcupine, color= "brown")
 
 st_intersection(porcupine, Boundary_contours) %>%
+  group_by(name) %>%
   summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = computed_length)
 
-trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
 ```
 
 
-Try plotting all trails: only plots last one
+Try plotting all trails: Fails
 ```{r}
 #function to take plot all trails
 plot_trail_fun <- function(data1, trail_name) {
@@ -135,6 +112,8 @@ plot_trail_fun <- function(data1, trail_name) {
   
   return(plot1)
 }
+
+trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
 
 #test function
 plot_trail_fun(macleish_layers[["trails"]], "Porcupine Trail")
