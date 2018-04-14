@@ -47,8 +47,6 @@ unzip(local_file, exdir = "contours")
 
 library(sf)
 dsn <- path.expand("contours")
-dsn
-list.files(dsn)
 
 st_layers(dsn)
 contours_elevation <- read_sf(dsn)
@@ -92,7 +90,7 @@ st_intersection(porcupine, Boundary_contours) %>%
 
 
 Function to make df for all trails, that has min and max:
-```{r}
+```{r, warning=FALSE}
 #function to take plot all trails
 trail_data_fun <- function(data1, trail_name) {
   
@@ -105,18 +103,23 @@ trail_data_fun <- function(data1, trail_name) {
   #intersect with contour data
   new_df <- st_intersection(trail_data, Boundary_contours) %>%
   group_by(name) %>%
-  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = sum(computed_length))
+  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = sum(computed_length), change = max-min)
   
   return(new_df)
 }
 
 trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
 
+#these are the trails that actually intersect with the contour data:
+trail_int_names <- c("Snowmobile Trail", "Eastern Loop", "Vernal Pool Loop", "Poplar Hill Road", "Western Loop", "Porcupine Trail") 
+
 #test function
 trail_data_fun(macleish_layers[["trails"]], "Porcupine Trail")
 
 #try with all trails:
-lapply(data1 = macleish_layers[["trails"]], trail_names, trail_data_fun)
+trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, trail_data_fun)
+
+trail_df <- bind_rows(unlist(trail_df_list)) #the names are missing
 
 ```
 
