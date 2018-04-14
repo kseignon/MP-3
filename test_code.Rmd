@@ -104,7 +104,7 @@ trail_data_fun <- function(data1, trail_name) {
   new_df <- st_intersection(trail_data, Boundary_contours) %>%
   group_by(name) %>%
   summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = sum(computed_length), change = max-min)
-  
+
   return(new_df)
 }
 
@@ -119,9 +119,23 @@ trail_data_fun(macleish_layers[["trails"]], "Porcupine Trail")
 #try with all trails:
 trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, trail_data_fun)
 
-trail_df <- bind_rows(unlist(trail_df_list)) #the names are missing
+trail_df <- bind_rows(unlist(trail_df_list)) #only resulted in one row, names are gone...
 
 ```
+
+Categorize each row
+```{r}
+#error: reading variable "change" as a list with 2 values
+trail_df_list[[1]] %>%
+  if (as.numeric(unlist(change)) < 1) {
+    mutate(category = "easy")
+  } else if (change < 50) {
+    mutate(category = "medium")
+  } else {
+    mutate(category = "hard")
+  }
+```
+
 
 
 Try with colors: Error
