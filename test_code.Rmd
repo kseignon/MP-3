@@ -124,9 +124,10 @@ trail_df_sf <-  do.call("rbind", trail_df_list)
 trail_df_sp <- as(trail_df_sf, "Spatial")
 
 #convert Multipoints to linestring
-trail_df_sp2 <- st_as_sfc(trail_df_sp, crs = NA_crs_) 
-trail_df_sp3 <- st_cast(trail_df_sp2, "MULTILINESTRING")
+trail_df_sp2 <- st_as_sfc(trail_df_sp) #param: , crs = NA_crs_  #convert to sfc to use st_cast()
+trail_df_sp3 <- st_cast(trail_df_sp2, "LINESTRING")
 
+#no applicable method for 'metaData' applied to an object of class "c('sfc_LINESTRING', 'sfc')"
 ```
 
 Categorize each row
@@ -176,7 +177,7 @@ leaflet() %>%
  addTiles() %>%
  addPolylines(data = macleish_layers[["boundary"]])%>%
  addPolylines(data = Boundary_contours) %>%
- addPolylines(data = trail_df_sp2, color= ~factpal(name))
+ addPolylines(data = trail_df_sp3, color= ~factpal(name))
 ```
 
 
