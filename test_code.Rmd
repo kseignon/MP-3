@@ -136,6 +136,27 @@ trail_df_list[[1]] %>%
   }
 ```
 
+Categorize each trail and plot:
+```{r, eval = FALSE}
+trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
+classification <- c("Easy", "Hard", "Hard", "Hard", "Medium", "Medium", "Easy", "Easy", "Hard", "Easy")
+
+trails_classified <- merge(trail_names, classification) 
+names(trails_classified)[1] <- "name" #rename column for join
+trails_final <- inner_join(macleish_layers[["trails"]], trails_classified, by = "name") #for some reason I get so many rows...
+
+#change data frame to spatial
+#as_Spatial(trails_final)
+#xy <- trails_final[,c(1,2)]
+#SpatialPointsDataFrame(coords = xy, data = trails_final,
+                              # proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
+
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = macleish_layers[["boundary"]])%>%
+  addPolylines(data = Boundary_contours)# %>%
+  #addPolylines(data = trails_final, color= "brown")
+```
 
 
 Try with colors: Error
