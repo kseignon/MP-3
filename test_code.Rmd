@@ -118,8 +118,17 @@ trail_data_fun(macleish_layers[["trails"]], "Porcupine Trail")
 
 #try with all trails:
 trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, trail_data_fun)
+trail_df_as_sp <- mapply(trail_df_list, n = n_list, list_to_df_fun)
 
-trail_df <- bind_rows(unlist(trail_df_list)) #only resulted in one row, names are gone...
+#trail_df <- merge(unlist(trail_df_list)) #only resulted in one row, names are gone...
+trail_df <- Reduce(function(...) merge(..., all=T), as(trail_df_list, "Spatial"))
+
+n_list <- c(1, 2, 3, 4, 5, 6)
+
+list_to_df_fun <- function(item1, n){
+  return(item1[[n]])
+}
+
 
 ```
 
