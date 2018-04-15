@@ -111,16 +111,20 @@ Entry trail | 0 | 208 | Easy
 Easy Out | 0 | 136 | Easy
 Driveway | 0 | 173 | Easy
 
-**Easy Trail:**  
-* x trail
-
 Categorize each trail and plot:
 ```{r}
 trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
-classification <- c()
+classification <- c("Easy", "Hard", "Hard", "Hard", "Medium", "Medium", "Easy", "Easy", "Hard", "Easy")
 
-trails_classified <- merge(trail_names, classification)
-trails_final <- merge(trails_classified, st_as_sf_macleish_layers[["trails"]])
+trails_classified <- merge(trail_names, classification) 
+names(trails_classified)[1] <- "name" #rename column for join
+trails_final <- inner_join(macleish_layers[["trails"]], trails_classified, by = "name") #for some reason I get so many rows...
+
+#change data frame to spatial
+as_Spatial(trails_final)
+xy <- trails_final[,c(1,2)]
+SpatialPointsDataFrame(coords = xy, data = trails_final,
+                               proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
 
 leaflet() %>%
   addTiles() %>%
