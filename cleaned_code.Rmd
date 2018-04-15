@@ -75,7 +75,7 @@ trail_data_fun <- function(data1, trail_name) {
   
   #filter the trail data
   trail_data <- st_as_sf(data1) %>%
-    filter(name == trail_name)
+    filter(name == trail_name) %>%
     mutate(computed_length = st_length(geometry))
   
   #intersect with contour data
