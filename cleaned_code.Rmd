@@ -69,14 +69,13 @@ trail_data_fun <- function(data1, trail_name) {
   
   #filter the trail data
   trail_data <- st_as_sf(data1) %>%
-  filter(name == trail_name) %>%
-  #group_by(name) %>%
-  mutate(computed_length = st_length(geometry))
+    filter(name == trail_name) %>%
+    mutate(computed_length = st_length(geometry))
   
   #intersect with contour data
   new_df <- st_intersection(trail_data, Boundary_contours) %>%
-  group_by(name) %>%
-  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = sum(computed_length), change = max-min)
+    group_by(name) %>%
+    summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = sum(computed_length), change = max-min)
 
   return(new_df)
 }
@@ -94,32 +93,26 @@ trail_df <- bind_rows(unlist(trail_df_list)) #only resulted in one row, names ar
 
 ```
 
-From testing to see where the trails intersect with the contour lines, we found that six out of ten trails intersect. We thus didn't include the other four in finding the intersections, and assume their change in elevation is zero.
+From testing to see where the trails intersect with the contour lines, we found that six out of ten trails intersect. We thus didn't include the other four trails (entry trail, Easy Out, Snowmobile trail, Driveway) in finding the intersections, and assume their change in elevation is zero.
 
-Test with just "Porcupine Trail"
+Based on the length and change in elevation that we calculated above, we made a new data frame that includes the classification for each trail. Trails were marked as "easy" if they had no change in elevation, and were less than xx miles long. Trails were marked as "hard" if they had a change in elevation greater than xxx, or a length longer than xxx. All other trails were classified as "medium".  
+
+Per this classification system, we have: 
+**Easy Trail:**  
+* x trail
+
+Categorize each trail and plot:
 ```{r}
-porcupine <- st_as_sf(macleish_layers[["trails"]]) %>%
-  filter(name == "Porcupine Trail") %>%
-  mutate(computed_length = st_length(geometry)) 
+trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
+classification <- c()
+
+trails_classified <- merge(trail_names, classification)
+trails_final <- merge(trails_classified, st_as_sf_macleish_layers[["trails"]])
 
 leaflet() %>%
   addTiles() %>%
   addPolylines(data = macleish_layers[["boundary"]])%>%
   addPolylines(data = Boundary_contours) %>%
-  addPolylines(data = porcupine, color= "brown")
-
-st_intersection(porcupine, Boundary_contours) %>%
-  group_by(name) %>%
-  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = computed_length)
-```
-
-Based on the length and change in elevation that we calculated above, we made a new data frame that includes the classification for each trail. Trails were marked as "easy" if they had no change in elevation, and were less than xx miles long. Trails were marked as "hard" if they had a change in elevation greater than xxx, or a length longer than xxx. All other trails were classified as "medium".
-
-Per this classification system, we have:
-
-Categorize each trail:
-```{r}
-trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
-
+  addPolylines(data = trails_final, color= "brown")
 ```
 
