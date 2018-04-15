@@ -1,9 +1,16 @@
 ---
 title: "cleaned_code"
-output: html_document
+authors: "Julia, Kareen, Julia"
+date: "April 15, 2018"
+output:
+  html_document:
+    code_folding: hide
 ---
 
-```{r}
+#### Goal:  
+We are trying to classify the trails of Macleish Field station as "Easy", "Medium", or "Hard", depending on their length and elevation data.
+
+```{r, messages = FALSE}
 library(sf)
 library(dplyr)
 # devtools::install_github("beanumber/macleish")
@@ -13,28 +20,13 @@ library(tidyverse)
 library(leaflet)
 ```
 
-Add length column:
+Find length of each trail, and make sure the crs is correct:
 ```{r}
-trails %>% 
-group_by(name) %>% 
-summarise(Num_segments = n(), 
-          total_length = sum(computed_length)) %>%
-arrange(total_length)
-```
+trails <- st_as_sf(macleish_layers[["trails"]]) %>% 
+  mutate(computed_length = st_length(geometry))
 
-Change crs of trails: Maybe not needed??
-```{r}
 trails_4326 <- trails %>%
   st_transform(4326)
-trails_4326
-```
-
-Test drawing trails:
-```{r}
-library(leaflet)
-leaflet() %>%
-  addTiles() %>%
-  addPolylines(data = trails_4326)
 ```
 
 Get contour data:
@@ -43,25 +35,25 @@ url <- "http://download.massgis.digital.mass.gov/shapefiles/state/contours250k.z
 local_file <- basename(url)
 download.file(url, destfile = local_file)
 unzip(local_file, exdir = "contours")
-```
 
-Make contours_elevation file
-```{r}
 library(sf)
 dsn <- path.expand("contours")
+
+st_layers(dsn)
 contours_elevation <- read_sf(dsn)
+names (contours_elevation)
 ```
 
-Check crs and projections...
+Check crs and projections:
 ```{r}
 st_crs(contours_elevation)
 contours_4326 <- st_transform(contours_elevation, 4326)
 st_crs(contours_4326)
 ```
 
-Restrict contours to macleish
+Restrict contours to macleish and plot with all trails:
 ```{r}
-Boundary_contours <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
+Boundary_contours[[1]] <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
 
 leaflet() %>%
   addTiles() %>%
@@ -70,7 +62,41 @@ leaflet() %>%
   addPolylines(data = macleish_layers[["trails"]], color= "brown")
 ```
 
-Test with just "Porcupine Trail:"
+Function to make df for all trails that calculates the change in elevation:
+```{r, warning=FALSE}
+#function to take plot all trails
+trail_data_fun <- function(data1, trail_name) {
+  
+  #filter the trail data
+  trail_data <- st_as_sf(data1) %>%
+  filter(name == trail_name) %>%
+  #group_by(name) %>%
+  mutate(computed_length = st_length(geometry))
+  
+  #intersect with contour data
+  new_df <- st_intersection(trail_data, Boundary_contours) %>%
+  group_by(name) %>%
+  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = sum(computed_length), change = max-min)
+
+  return(new_df)
+}
+
+#these are the trails that actually intersect with the contour data:
+trail_int_names <- c("Snowmobile Trail", "Eastern Loop", "Vernal Pool Loop", "Poplar Hill Road", "Western Loop", "Porcupine Trail") 
+
+#test function
+trail_data_fun(macleish_layers[["trails"]], "Porcupine Trail")
+
+#try with all trails:
+trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, trail_data_fun)
+
+trail_df <- bind_rows(unlist(trail_df_list)) #only resulted in one row, names are gone...
+
+```
+
+From testing to see where the trails intersect with the contour lines, we found that six out of ten trails intersect. We thus didn't include the other four in finding the intersections, and assume their change in elevation is zero.
+
+Test with just "Porcupine Trail"
 ```{r}
 porcupine <- st_as_sf(macleish_layers[["trails"]]) %>%
   filter(name == "Porcupine Trail") %>%
@@ -82,6 +108,18 @@ leaflet() %>%
   addPolylines(data = Boundary_contours) %>%
   addPolylines(data = porcupine, color= "brown")
 
+st_intersection(porcupine, Boundary_contours) %>%
+  group_by(name) %>%
+  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = computed_length)
 ```
 
-#for each geometry set in the linestring, match with contour line geometry to give FT?
+Based on the length and change in elevation that we calculated above, we made a new data frame that includes the classification for each trail. Trails were marked as "easy" if they had no change in elevation, and were less than xx miles long. Trails were marked as "hard" if they had a change in elevation greater than xxx, or a length longer than xxx. All other trails were classified as "medium".
+
+Per this classification system, we have:
+
+Categorize each trail:
+```{r}
+trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
+
+```
+
