@@ -1,6 +1,6 @@
 ---
 title: "cleaned_code"
-authors: "Julia, Kareen, Julia"
+author: "Julia, Kareen, Julia"
 date: "April 15, 2018"
 output:
   html_document:
@@ -8,11 +8,11 @@ output:
 ---
 
 #### Goal:  
-We are trying to classify the trails of Macleish Field station as "Easy", "Medium", or "Hard", depending on their length and elevation data.
+We are trying to classify the trails of Macleish Field station as "Easy", "Medium", or "Hard", depending on their length and elevation data. [^1]
 
 In order to answer this, we will use data of the field station's location boundaries and trails. We also use elevation data from MassGIS.
 
-```{r, messages = FALSE}
+```{r, messages = FALSE, warnings = FALSE}
 library(sf)
 library(dplyr)
 # devtools::install_github("beanumber/macleish")
@@ -57,7 +57,7 @@ st_crs(contours_4326)
 ```
 
 Restrict contours to Macleish and plot contour lines with all trails:
-```{r}
+```{r, warning=FALSE}
 Boundary_contours <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
 
 leaflet() %>%
@@ -138,4 +138,22 @@ leaflet() %>%
 
 From this data, the Macleish Field Station can provide visitors with a color-coded map, classifying each trail by how difficult it is. They can also show a map including the elevation data as an informational map to describe the field station location more accurately. 
 
+```{r}
+easy <- trails_4326 %>%
+  filter(name == "entry trail" | name == "Easy Out" | name == "Porcupine Trail" | name == "Driveway") 
+medium <- trails_4326 %>%
+  filter(name == "Vernal Pool Loop" | name == "Eastern Loop") 
+hard <- trails_4326 %>%
+  filter(name == "Snowmobile Trail" | name == "Poplar Hill Road" | name == "Western Loop")
+  
+leaflet() %>%
+  addTiles() %>%
+  addPolylines(data = macleish_layers[["boundary"]])%>%
+  addPolylines(data = Boundary_contours) %>%
+  addPolylines(data = easy, color= "green") %>%
+  addPolylines(data = medium, color= "orange") %>%
+  addPolylines(data = hard, color= "red")
+```
 
+
+[^1]: Github repository used: https://github.com/kseignon/Mini-project-3
