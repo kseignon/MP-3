@@ -102,7 +102,7 @@ Based on the length and change in elevation that we calculated above, we made a 
 
 Per this classification system, we have: 
 
-Trail | Change in elevation | length (meters?) | classification
+Trail | Change in elevation | length (meters) | classification
 --|--|--|--
 Snowmobile Trail | 120 | 6,497 | Hard 
 Eastern Loop | 30 | 3,049 | Medium
