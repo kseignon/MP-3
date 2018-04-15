@@ -23,13 +23,15 @@ library(leaflet)
 Find length of each trail, and make sure the crs is correct:
 ```{r}
 trails <- st_as_sf(macleish_layers[["trails"]]) %>% 
-  mutate(computed_length = st_length(geometry))
+  mutate(computed_length = st_length(geometry)) %>%
+  group_by(name) %>%
+  summarise(length = sum(computed_length))
 
 trails_4326 <- trails %>%
   st_transform(4326)
 ```
 
-Get contour data:
+Get contour data: 
 ```{r}
 url <- "http://download.massgis.digital.mass.gov/shapefiles/state/contours250k.zip"
 local_file <- basename(url)
@@ -41,8 +43,9 @@ dsn <- path.expand("contours")
 
 st_layers(dsn)
 contours_elevation <- read_sf(dsn)
-names (contours_elevation)
 ```
+
+This contour data was retrieved from MassGIS. There is also contour data available in the `macleish` R package. We didn't use the updated package as we already had our code by the time it was included.
 
 Check crs and projections:
 ```{r}
@@ -51,7 +54,7 @@ contours_4326 <- st_transform(contours_elevation, 4326)
 st_crs(contours_4326)
 ```
 
-Restrict contours to macleish and plot with all trails:
+Restrict contours to Macleish and plot contour lines with all trails:
 ```{r}
 Boundary_contours[[1]] <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
 
@@ -62,14 +65,14 @@ leaflet() %>%
   addPolylines(data = macleish_layers[["trails"]], color= "brown")
 ```
 
-Function to make df for all trails that calculates the change in elevation:
+Function to make data frame for all trails that calculates the change in elevation:
 ```{r, warning=FALSE}
 #function to take plot all trails
 trail_data_fun <- function(data1, trail_name) {
   
   #filter the trail data
   trail_data <- st_as_sf(data1) %>%
-    filter(name == trail_name) %>%
+    filter(name == trail_name)
     mutate(computed_length = st_length(geometry))
   
   #intersect with contour data
@@ -83,9 +86,6 @@ trail_data_fun <- function(data1, trail_name) {
 #these are the trails that actually intersect with the contour data:
 trail_int_names <- c("Snowmobile Trail", "Eastern Loop", "Vernal Pool Loop", "Poplar Hill Road", "Western Loop", "Porcupine Trail") 
 
-#test function
-trail_data_fun(macleish_layers[["trails"]], "Porcupine Trail")
-
 #try with all trails:
 trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, trail_data_fun)
 
@@ -93,11 +93,24 @@ trail_df <- bind_rows(unlist(trail_df_list)) #only resulted in one row, names ar
 
 ```
 
-From testing to see where the trails intersect with the contour lines, we found that six out of ten trails intersect. We thus didn't include the other four trails (entry trail, Easy Out, Snowmobile trail, Driveway) in finding the intersections, and assume their change in elevation is zero.
+From testing to see where the trails intersect with the contour lines, we found that six out of ten trails intersect. We thus didn't include the other three trails (entry trail, Easy Out, Driveway) in finding the intersections, and assume their change in elevation is zero.
 
-Based on the length and change in elevation that we calculated above, we made a new data frame that includes the classification for each trail. Trails were marked as "easy" if they had no change in elevation, and were less than xx miles long. Trails were marked as "hard" if they had a change in elevation greater than xxx, or a length longer than xxx. All other trails were classified as "medium".  
+Based on the length and change in elevation that we calculated above, we made a new data frame that includes the classification for each trail. Trails were marked as "easy" if they had no change in elevation, and were less than 1,000 meters long. Trails were marked as "hard" if they had a change in elevation greater than 50, or a length longer than 5,000. All other trails were classified as "medium".  
 
 Per this classification system, we have: 
+
+Trail | Change in elevation | length (meters?) | classification
+--|--|--|--
+Snowmobile Trail | 120 | 6,497 | Hard 
+Eastern Loop | 30 | 3,049 | Medium
+Vernal Pool Loop | 30 | 721 | Medium
+Poplar Hill Road | 60 | 2,700 | Hard
+Western Loop | 90 | 4,071 | Hard
+Porcupine Trail | 0 | 700 | Easy 
+Entry trail | 0 | 208 | Easy
+Easy Out | 0 | 136 | Easy
+Driveway | 0 | 173 | Easy
+
 **Easy Trail:**  
 * x trail
 
