@@ -147,6 +147,8 @@ test <- head(trail_df_sf4, 1)
     mutate(test, category = "medium")
   }
 
+#(test$change < 100 | as.numeric(test$length) > 20)
+
 classify_fun <- function(data1) {
   data2 <- if (data1$change < 1) {
     mutate(data1, category = "easy")
