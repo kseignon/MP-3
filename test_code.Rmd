@@ -124,22 +124,17 @@ trail_df_sf <-  do.call("rbind", trail_df_list)
 
 #convert Multipoints to linestring for leaflet plotting
 trail_df_sf2 <- as.data.frame(trail_df_sf) #makes data.frame
-trail_df_sf3 <- st_sf(trail_df_sf4) #makes sf
-trail_df_sf4 <- st_cast(trail_df_sf5, "LINESTRING") #change points to linestring
+trail_df_sf3 <- st_sf(trail_df_sf2) #makes sf
+trail_df_sf4 <- st_cast(trail_df_sf3, "LINESTRING") #change points to linestring
 
-
-#trail_df_sp2 <- st_as_sfc(trail_df_sp) #param: , crs = NA_crs_  #convert to sfc to use st_cast()
-
-
-
-#no applicable method for 'metaData' applied to an object of class "c('sfc_LINESTRING', 'sfc')"
 ```
 
 Categorize each row
 ```{r}
 #error: reading variable "change" as a list with 2 values
-trail_df_list[[1]] %>%
-  if (as.numeric(unlist(change)) < 1) {
+
+head(trail_df_sf4, 1) %>%
+  if (change < 1) {
     mutate(category = "easy")
   } else if (change < 50) {
     mutate(category = "medium")
