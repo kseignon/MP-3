@@ -161,14 +161,14 @@ Try with colors: Grey os far...
 ```{r}
 library(colorspace)
 
-factpal <- colorFactor((rainbow_hcl(n = 9, c = 50, l = 70, start = 1, end = 320)), trails$name, TRUE)
-
+#factpal <- colorFactor((rainbow_hcl(n = 9, c = 50, l = 70, start = 1, end = 320)), trails$name, TRUE)
+factpal2 <- colorFactor(palette = "Dark2", trail_df_sf4$category)
 
 leaflet() %>%
  addTiles() %>%
  addPolylines(data = macleish_layers[["boundary"]])%>%
  addPolylines(data = Boundary_contours) %>%
- addPolylines(data = trail_df_sf4, color= ~factpal(category))
+ addPolylines(data = trail_df_sf4, color= ~factpal2(category))
 ```
 
 
