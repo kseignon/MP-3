@@ -90,69 +90,12 @@ st_intersection(porcupine, Boundary_contours) %>%
 
 
 Function to make df for all trails, that has min and max:
-```{r, warning=FALSE}
-#function to take plot all trails
-trail_data_fun <- function(data1, trail_name) {
-  
-  #filter the trail data
-  trail_data <- st_as_sf(data1) %>%
-  filter(name == trail_name) %>%
-  #group_by(name) %>%
-  mutate(computed_length = st_length(geometry))
-  
-  #intersect with contour data
-  new_df <- st_intersection(trail_data, Boundary_contours) %>%
-  group_by(name) %>%
-  summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = sum(computed_length), change = max-min)
-
-  return(new_df)
-}
-
-trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
-
-#these are the trails that actually intersect with the contour data:
-trail_int_names <- c("Snowmobile Trail", "Eastern Loop", "Vernal Pool Loop", "Poplar Hill Road", "Western Loop", "Porcupine Trail") 
-
-#test function
-trail_data_fun(macleish_layers[["trails"]], "Porcupine Trail")
-
-#try with all trails:
-trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, trail_data_fun)
-
-#merge list of df into one df
-trail_df_sf <-  do.call("rbind", trail_df_list) 
-
-#convert Multipoints to linestring for leaflet plotting
-trail_df_sf2 <- as.data.frame(trail_df_sf) #makes data.frame
-trail_df_sf3 <- st_sf(trail_df_sf2) #makes sf
-trail_df_sf4 <- st_cast(trail_df_sf3, "LINESTRING") #change points to linestring
-
-```
-
-Categorize each row
 ```{r}
-#error: reading variable "change" as a list with 2 values
-
-#!grep(change, "\[.\]") #this extracts only the value
-#stringr::regmatches(change, !regexpr("\[.\]", change))
-#test %>%
-  #value <- regmatches(test$change, "\\[.\\]", invert = TRUE)
-#for now, only try with first row
-test <- head(trail_df_sf4, 1)
-  if (test$change < 1) {
-    mutate(test, category = "easy")
-  } else if (test$change > 1000) {
-    mutate(test, category = "hard")
-  } else {
-    mutate(test, category = "medium")
-  }
-
-#(test$change < 100 | as.numeric(test$length) > 20)
-
+#function to classify trail difficulty
 classify_fun <- function(data1) {
   data2 <- if (data1$change < 1) {
     mutate(data1, category = "easy")
-  } else if (data1$change > 1000) {
+  } else if (data1$change > 1000 || as.numeric(data1$length) > 5000) {
     mutate(data1, category = "hard")
   } else {
     mutate(data1, category = "medium")
@@ -160,55 +103,54 @@ classify_fun <- function(data1) {
 return(data2)  
 }
 
-classify_fun(test)
-trail_df_sf1 <- lapply(trail_df_list, classify_fun)
+#classify list of trails
+trail_df_list2 <- lapply(trail_df_list, classify_fun)
 
 #merge list of df into one df
-trail_df_sf <-  do.call("rbind", trail_df_sf1) 
+trail_df_sf <-  do.call("rbind", trail_df_list2) 
 
 #convert Multipoints to linestring for leaflet plotting
 trail_df_sf2 <- as.data.frame(trail_df_sf) #makes data.frame
 trail_df_sf3 <- st_sf(trail_df_sf2) #makes sf
 trail_df_sf4 <- st_cast(trail_df_sf3, "LINESTRING") #change points to linestring
-
 ```
 
-Categorize each trail and plot:
-```{r, eval = FALSE}
-trail_names <- c("Porcupine Trail", "Western Loop", "Poplar Hill Road", "Vernal Pool Loop", "Eastern Loop", "entry trail", "Easy Out", "Snowmobile Trail", "Driveway")
-classification <- c("Easy", "Hard", "Hard", "Hard", "Medium", "Medium", "Easy", "Easy", "Hard", "Easy")
 
-trails_classified <- merge(trail_names, classification) 
-names(trails_classified)[1] <- "name" #rename column for join
-trails_final <- inner_join(macleish_layers[["trails"]], trails_classified, by = "name") #for some reason I get so many rows...
-
-#change data frame to spatial
-#as_Spatial(trails_final)
-#xy <- trails_final[,c(1,2)]
-#SpatialPointsDataFrame(coords = xy, data = trails_final,
-                              # proj4string = CRS("+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"))
-
+```{r}
+easy <- trails_4326 %>%
+  filter(name == "entry trail" | name == "Easy Out" | name == "Porcupine Trail" | name == "Driveway") 
+medium <- trails_4326 %>%
+  filter(name == "Vernal Pool Loop" | name == "Eastern Loop") 
+hard <- trails_4326 %>%
+  filter(name == "Snowmobile Trail" | name == "Poplar Hill Road" | name == "Western Loop")
+  
 leaflet() %>%
   addTiles() %>%
   addPolylines(data = macleish_layers[["boundary"]])%>%
-  addPolylines(data = Boundary_contours)# %>%
-  #addPolylines(data = trails_final, color= "brown")
+  addPolylines(data = Boundary_contours) %>%
+  addPolylines(data = easy, color= "green") %>%
+  addPolylines(data = medium, color= "orange") %>%
+  addPolylines(data = hard, color= "red")
 ```
 
-
-Try with colors: Error
+Try with colors:
 ```{r}
 library(colorspace)
 
 factpal <- colorFactor((rainbow_hcl(n = 9, c = 50, l = 70, start = 1, end = 320)), trails$name, TRUE)
+factpal2 <- colorFactor(topo.colors(4), trail_df_sf4$category)
+factpal3 <- colorFactor(palette = "Dark2", trail_df_sf4$category)
 
-#factpal2 <- colorFactor(palette = c("red", "blue", "orange", "grey", "white"), domain = trail_df_sf2)
+
+pal <- colorNumeric(
+  palette = "Blues",
+  domain = trail_df_sf4$category)
 
 leaflet() %>%
  addTiles() %>%
  addPolylines(data = macleish_layers[["boundary"]])%>%
  addPolylines(data = Boundary_contours) %>%
- addPolylines(data = trail_df_sf4, color= ~factpal(name))
+ addPolylines(data = trail_df_sf4, color= ~factpal3(category))
+ #addPolylines(data = trail_df_sf4, color= ~factpal3(name))
 ```
-
 
