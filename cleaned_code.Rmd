@@ -91,20 +91,38 @@ trail_int_names <- c("Snowmobile Trail", "Eastern Loop", "Vernal Pool Loop", "Po
 
 #try with all trails:
 trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, trail_data_fun)
-
-#merge list of df into one df
-trail_df_sf <-  do.call("rbind", trail_df_list) 
-
-#convert Multipoints to linestring for leaflet plotting
-trail_df_sf2 <- as.data.frame(trail_df_sf) #makes data.frame
-trail_df_sf3 <- st_sf(trail_df_sf2) #makes sf
-trail_df_sf4 <- st_cast(trail_df_sf3, "LINESTRING") #change points to linestring
-
 ```
 
 From testing to see where the trails intersect with the contour lines, we found that six out of ten trails intersect. We thus didn't include the other three trails (entry trail, Easy Out, Driveway) in finding the intersections, and assume their change in elevation is zero.
 
 Based on the length and change in elevation that we calculated above, we made a new data frame that includes the classification for each trail. Trails were marked as "easy" if they had no change in elevation, and were less than 1,000 meters long. Trails were marked as "hard" if they had a change in elevation greater than 50, or a length longer than 5,000. All other trails were classified as "medium".  
+
+Classify each trail:
+```{r}
+#function to classify trail difficulty
+classify_fun <- function(data1) {
+  data2 <- if (data1$change < 1) {
+    mutate(data1, category = "easy")
+  } else if (data1$change > 1000) {
+    mutate(data1, category = "hard")
+  } else {
+    mutate(data1, category = "medium")
+  }
+return(data2)  
+}
+
+#classify list of trails
+trail_df_list2 <- lapply(trail_df_list, classify_fun)
+
+#merge list of df into one df
+trail_df_sf <-  do.call("rbind", trail_df_list2) 
+
+#convert Multipoints to linestring for leaflet plotting
+trail_df_sf2 <- as.data.frame(trail_df_sf) #makes data.frame
+trail_df_sf3 <- st_sf(trail_df_sf2) #makes sf
+trail_df_sf4 <- st_cast(trail_df_sf3, "LINESTRING") #change points to linestring
+```
+
 
 Per this classification system, we have: 
 
