@@ -133,14 +133,42 @@ Categorize each row
 ```{r}
 #error: reading variable "change" as a list with 2 values
 
-head(trail_df_sf4, 1) %>%
-  if (change < 1) {
-    mutate(category = "easy")
-  } else if (change < 50) {
-    mutate(category = "medium")
+#!grep(change, "\[.\]") #this extracts only the value
+#stringr::regmatches(change, !regexpr("\[.\]", change))
+#test %>%
+  #value <- regmatches(test$change, "\\[.\\]", invert = TRUE)
+#for now, only try with first row
+test <- head(trail_df_sf4, 1)
+  if (test$change < 1) {
+    mutate(test, category = "easy")
+  } else if (test$change > 1000) {
+    mutate(test, category = "hard")
   } else {
-    mutate(category = "hard")
+    mutate(test, category = "medium")
   }
+
+classify_fun <- function(data1) {
+  data2 <- if (data1$change < 1) {
+    mutate(data1, category = "easy")
+  } else if (data1$change > 1000) {
+    mutate(data1, category = "hard")
+  } else {
+    mutate(data1, category = "medium")
+  }
+return(data2)  
+}
+
+classify_fun(test)
+trail_df_sf1 <- lapply(trail_df_list, classify_fun)
+
+#merge list of df into one df
+trail_df_sf <-  do.call("rbind", trail_df_sf1) 
+
+#convert Multipoints to linestring for leaflet plotting
+trail_df_sf2 <- as.data.frame(trail_df_sf) #makes data.frame
+trail_df_sf3 <- st_sf(trail_df_sf2) #makes sf
+trail_df_sf4 <- st_cast(trail_df_sf3, "LINESTRING") #change points to linestring
+
 ```
 
 Categorize each trail and plot:
@@ -172,6 +200,7 @@ library(colorspace)
 
 factpal <- colorFactor((rainbow_hcl(n = 9, c = 50, l = 70, start = 1, end = 320)), trails$name, TRUE)
 
+#factpal2 <- colorFactor(palette = c("red", "blue", "orange", "grey", "white"), domain = trail_df_sf2)
 
 leaflet() %>%
  addTiles() %>%
