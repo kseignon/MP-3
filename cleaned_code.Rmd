@@ -68,7 +68,7 @@ leaflet() %>%
 ```
 
 Function to make data frame for all trails that calculates the change in elevation:
-```{r, warning=FALSE, eval = FALSE}
+```{r, warning=FALSE}
 
 #function to take plot all trails
 trail_data_fun <- function(data1, trail_name) {
@@ -98,7 +98,7 @@ From testing to see where the trails intersect with the contour lines, we found 
 Based on the length and change in elevation that we calculated above, we made a new data frame that includes the classification for each trail. Trails were marked as "easy" if they had no change in elevation, and were less than 1,000 meters long. Trails were marked as "hard" if they had a change in elevation greater than 50, or a length longer than 5,000. All other trails were classified as "medium".  
 
 Classify each trail:
-```{r}
+```{r, warning=FALSE}
 #function to classify trail difficulty
 classify_fun <- function(data1) {
   data2 <- if (data1$change < 1) {
