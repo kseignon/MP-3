@@ -90,6 +90,39 @@ st_intersection(porcupine, Boundary_contours) %>%
 
 
 Function to make df for all trails, that has min and max:
+```{r, warning=FALSE, eval = FALSE}
+
+#function to take plot all trails
+trail_data_fun <- function(data1, trail_name) {
+  
+  #filter the trail data
+  trail_data <- st_as_sf(data1) %>%
+    filter(name == trail_name) %>%
+    mutate(computed_length = st_length(geometry))
+  
+  #intersect with contour data
+  new_df <- st_intersection(trail_data, Boundary_contours) %>%
+    group_by(name) %>%
+    summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = sum(computed_length), change = max-min)
+
+  #add back in original trails geometry
+  new_df2 <- left_join(new_df, st_geometry(data1))
+  
+  return(new_df)
+}
+
+#need to add orig trails geometry
+test <- trail_data_fun(macleish_layers[["trails"]], "Porcupine Trail")
+left_join(test, st_geometry(macleish_layers[["trails"]]))
+
+
+#these are the trails that actually intersect with the contour data:
+trail_int_names <- c("Snowmobile Trail", "Eastern Loop", "Vernal Pool Loop", "Poplar Hill Road", "Western Loop", "Porcupine Trail") 
+
+#try with all trails:
+trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, trail_data_fun)
+```
+
 ```{r}
 #function to classify trail difficulty
 classify_fun <- function(data1) {
