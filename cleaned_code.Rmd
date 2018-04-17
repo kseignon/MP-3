@@ -7,10 +7,12 @@ output:
     code_folding: hide
 ---
 
-#### Goal:  
+#### The Trail to A Better Macleish? "Easy"!
+
+Our task was to classify preexisting Macleish Field Station trails by as “Easy”, “Moderate”, or “Difficult” according to the length and change in elevation of the trails. The data we used for this purpose was the existing trails shapefile data and 10’ contour elevation data. The former data came from the R package macleish, which included trail names and geometry points, and the latter was downloaded from the MassGIS website, and includes geometry points for elevation lines.
+
 We are trying to classify the trails of Macleish Field station as "Easy", "Medium", or "Hard", depending on their length and elevation data. [^1]
 
-In order to answer this, we will use data of the field station's location boundaries and trails. We also use elevation data from MassGIS.
 
 ```{r, messages = FALSE, warning = FALSE, message=FALSE}
 library(sf)
@@ -157,19 +159,9 @@ leaflet() %>%
   addPolylines(data = hard, color= "red")
 ```
 
-Try with colors: Grey so far...
-```{r}
-library(colorspace)
+As an outcome of our analysis, the Macleish Station may consider publishing information including the difficulty of each trial beside the trail names. We would recommend two sample methods for communicating this information about the park: signs and brochures/flyers. Signs at the park should include signs that mark the beginning of the trail and signs that mark intersections between trails. A comprehensive indoor or outdoor park map including the updated classification of trails may also be desirable. Besides signs, standards and brochures/flyers could also be created.
 
-#factpal <- colorFactor((rainbow_hcl(n = 9, c = 50, l = 70, start = 1, end = 320)), trails$name, TRUE)
-factpal2 <- colorFactor(palette = "Dark2", trail_df_sf4$category)
-
-leaflet() %>%
- addTiles() %>%
- addPolylines(data = macleish_layers[["boundary"]])%>%
- addPolylines(data = Boundary_contours) %>%
- addPolylines(data = trail_df_sf4, color= ~factpal2(category))
-```
+The implementation strategy our group recommends is a high-quality recycled paper or plastic map including trails to be located inside of the Macleish Bechtel classroom, a map online including trails, and outdoor wooden trail signs. In terms of cost, high-quality outdoor wooden trail signs vary in price and price can only be determined by a company estimate. However, price is determined by the complexity of the sign, so if the trail name is abbreviated or shortened and the difficulty labels “Easy, “Moderate”, and “Difficult” are printed in black and white or engraved without color, that could lower the price. Changing the label “Difficult” to “Hard” would also lower the price by reducing the cost per letter. The replacement of brochures with the on-site and online map eliminates the periodic cost of ordering brochures. This project will have minimal environmental impact if sustainably forested wood is used as opposed to intensively mined aluminum. Moreover, eliminating brochures and centralizing trail information using a map at the Bechtel Classroom and online will reduce paper waste.
 
 
 [^1]: Github repository used: https://github.com/kseignon/Mini-project-3
