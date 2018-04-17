@@ -106,14 +106,15 @@ trail_data_fun <- function(data1, trail_name) {
     summarise(min = min(CONTOUR_FT), max = max(CONTOUR_FT), length = sum(computed_length), change = max-min)
 
   #add back in original trails geometry
-  new_df2 <- left_join(new_df, st_geometry(data1))
+  new_df2 <- st_join(data1, new_df)
   
-  return(new_df)
+  return(new_df2)
 }
 
 #need to add orig trails geometry
 test <- trail_data_fun(macleish_layers[["trails"]], "Porcupine Trail")
 left_join(test, st_geometry(macleish_layers[["trails"]]))
+st_join(test, macleish_layers[["trails"]])
 
 
 #these are the trails that actually intersect with the contour data:
@@ -171,19 +172,19 @@ Try with colors:
 library(colorspace)
 
 factpal <- colorFactor((rainbow_hcl(n = 9, c = 50, l = 70, start = 1, end = 320)), trails$name, TRUE)
-factpal2 <- colorFactor(topo.colors(4), trail_df_sf4$category)
+factpal2 <- colorFactor(topo.colors(3), trail_df_sf4$category)
 factpal3 <- colorFactor(palette = "Dark2", trail_df_sf4$category)
 
 
-pal <- colorNumeric(
-  palette = "Blues",
-  domain = trail_df_sf4$category)
+#pal <- colorNumeric(
+#  palette = "Blues",
+#  domain = trail_df_sf4$category)
 
 leaflet() %>%
  addTiles() %>%
  addPolylines(data = macleish_layers[["boundary"]])%>%
  addPolylines(data = Boundary_contours) %>%
- addPolylines(data = trail_df_sf4, color= ~factpal3(category))
+ addPolylines(data = trail_df_sf4, color= ~factpal2(category))
  #addPolylines(data = trail_df_sf4, color= ~factpal3(name))
 ```
 
