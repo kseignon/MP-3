@@ -157,7 +157,7 @@ leaflet() %>%
   addPolylines(data = hard, color= "red")
 ```
 
-Try with colors: Grey os far...
+Try with colors: Grey so far...
 ```{r}
 library(colorspace)
 
