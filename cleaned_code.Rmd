@@ -12,7 +12,7 @@ We are trying to classify the trails of Macleish Field station as "Easy", "Mediu
 
 In order to answer this, we will use data of the field station's location boundaries and trails. We also use elevation data from MassGIS.
 
-```{r, messages = FALSE, warnings = FALSE}
+```{r, messages = FALSE, warning = FALSE, message=FALSE}
 library(sf)
 library(dplyr)
 # devtools::install_github("beanumber/macleish")
@@ -34,7 +34,7 @@ trails_4326 <- trails %>%
 ```
 
 Get contour data: 
-```{r}
+```{r, message =FALSE}
 url <- "http://download.massgis.digital.mass.gov/shapefiles/state/contours250k.zip"
 local_file <- basename(url)
 download.file(url, destfile = local_file)
@@ -43,7 +43,7 @@ unzip(local_file, exdir = "contours")
 library(sf)
 dsn <- path.expand("contours")
 
-st_layers(dsn)
+#st_layers(dsn)
 contours_elevation <- read_sf(dsn)
 ```
 
@@ -51,13 +51,13 @@ This contour data was retrieved from MassGIS. There is also contour data availab
 
 Check crs and projections:
 ```{r}
-st_crs(contours_elevation)
+#st_crs(contours_elevation)
 contours_4326 <- st_transform(contours_elevation, 4326)
-st_crs(contours_4326)
+#st_crs(contours_4326)
 ```
 
 Restrict contours to Macleish and plot contour lines with all trails:
-```{r, warning=FALSE}
+```{r, warning=FALSE, message = FALSE}
 Boundary_contours <- st_intersection(st_as_sf(macleish_layers[["boundary"]]), contours_4326)
 
 leaflet() %>%
@@ -68,7 +68,7 @@ leaflet() %>%
 ```
 
 Function to make data frame for all trails that calculates the change in elevation:
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 
 #function to take plot all trails
 trail_data_fun <- function(data1, trail_name) {
