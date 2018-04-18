@@ -103,9 +103,11 @@ Classify each trail:
 ```{r, warning = FALSE, message=FALSE}
 #function to classify trail difficulty
 classify_fun <- function(data1) {
-  data2 <- if (data1$change < 1) {
+  data2 <- if (data1$change < 1 & as.numeric(data1$length) > 1000) {
     mutate(data1, category = "easy")
-  } else if (data1$change > 1000 || as.numeric(data1$length) > 5000) {
+  } else if (data1$change > 50) {
+    mutate(data1, category = "hard")
+  } else if (as.numeric(data1$length) > 5000) {
     mutate(data1, category = "hard")
   } else {
     mutate(data1, category = "medium")
