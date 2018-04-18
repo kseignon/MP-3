@@ -1,5 +1,5 @@
 ---
-title: "cleaned_code"
+title: "The Trail to a Better Macleish? 'Easy'! "
 author: "Julia, Kareen, Julia"
 date: "April 15, 2018"
 output:
@@ -7,12 +7,13 @@ output:
     code_folding: hide
 ---
 
-#### The Trail to A Better Macleish? "Easy"!
+#### Overview
 
 Our task was to classify preexisting Macleish Field Station trails by as “Easy”, “Moderate”, or “Difficult” according to the length and change in elevation of the trails. The data we used for this purpose was the existing trails shapefile data and 10’ contour elevation data. For our project, we marked trails as "Easy" if they had no change in elevation, and were less than 1,000 meters long. We marked trails as "Difficult if they had a change in elevation greater than 50, or a length longer than 5,000. We classified all other trails as "Moderate". This judgment was made according to the range of lengths of our data as well as intuitive reasoning. Our reasoning includes that a trail with no change in elevation would be easiest to hike, and that if a trail does not fall on the two extremes, it should be considered "Moderate".
 
 The two datasets we used were the trails dataset and the contour elevation dataset. The trail shapefile data came from the R package macleish, which included trail names and geometry points. The trails dataset contains 15 observations of four variables, including the names of the trails, while the elevation data was collection of intervals of contour markings along a certain geometry. Both the contours data and the trails data were classified as sf objects. [^1]
 
+#### Data wrangling
 
 ```{r, messages = FALSE, warning = FALSE, message=FALSE}
 library(sf)
@@ -48,8 +49,6 @@ dsn <- path.expand("contours")
 #st_layers(dsn)
 contours_elevation <- read_sf(dsn)
 ```
-
-This contour data was retrieved from MassGIS. There is also contour data available in the `macleish` R package. We didn't use the updated package as we already had our code by the time it was included.
 
 Check crs and projections:
 ```{r, warning = FALSE, message=FALSE}
@@ -94,6 +93,8 @@ trail_int_names <- c("Snowmobile Trail", "Eastern Loop", "Vernal Pool Loop", "Po
 #apply to trails list:
 trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, trail_data_fun)
 ```
+
+#### Classification
 
 From testing to see where the trails intersect with the contour lines, we found that six out of ten trails intersect. We thus didn't include the other three trails (entry trail, Easy Out, Driveway) in finding the intersections, and assume their change in elevation is zero.
 
@@ -161,9 +162,11 @@ leaflet() %>%
   addPolylines(data = difficult, color= "red")
 ```
 
+#### Discussion
+
 As an outcome of our analysis, the Macleish Station may consider publishing information including the difficulty of each trial beside the trail names. We would recommend two sample methods for communicating this information about the park: signs and brochures/flyers. Signs at the park should include signs that mark the beginning of the trail and signs that mark intersections between trails so visitors avoid getting lost. A comprehensive indoor or outdoor park map including the updated classification of trails may also be desirable. Aside from the signs, standards and brochures/flyers could also be created.
 
-The implementation strategy our group recommends is a high-quality recycled paper or plastic map including trails to be located inside of the Macleish Bechtel classroom, a map online including trails, and outdoor wooden trail signs. In terms of cost, high-quality outdoor wooden trail signs vary in price and price can only be determined by a company estimate. However, price is determined by the complexity of the sign, so if the trail name is abbreviated or shortened and the difficulty labels “Easy, “Moderate”, and “Difficult” are printed in black and white or engraved without color, that could lower the price. Changing the label “Difficult” to “Hard” would also lower the price by reducing the cost per letter. The replacement of brochures with the on-site and online map eliminates the periodic cost of ordering brochures. This project will have minimal environmental impact if sustainably forested wood is used as opposed to intensively mined aluminum (Alexander, Greber). Moreover, eliminating brochures and centralizing trail information using a map at the Bechtel Classroom and online will reduce paper waste.
+The implementation strategy our group recommends is a high-quality recycled paper or plastic map including trails to be located inside of the Macleish Bechtel classroom, a map online including trails, and outdoor wooden trail signs. In terms of cost, high-quality outdoor wooden trail signs vary in price and price can only be determined by a company estimate. However, price is determined by the complexity of the sign, so if the trail name is abbreviated or shortened and the difficulty labels “Easy, “Moderate”, and “Difficult” are printed in black and white or engraved without color, that could lower the price. Changing the label “Difficult” to “Hard” would also lower the price by reducing the cost per letter. The replacement of brochures with the on-site and online map eliminates the periodic cost of ordering brochures. This project will have minimal environmental impact if sustainably forested wood is used as opposed to intensively mined aluminum (Alexander et. al., 1991). Moreover, eliminating brochures and centralizing trail information using a map at the Bechtel Classroom and online will reduce paper waste.
 
 Sources:
 Alexander, S., Greber, B. (1991). Environmental Ramifications of Various Materials Used in Construction and Manufacture in the United States. General Technical Report, PNW-GTR-277.
