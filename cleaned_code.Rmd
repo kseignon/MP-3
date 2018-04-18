@@ -9,9 +9,9 @@ output:
 
 #### The Trail to A Better Macleish? "Easy"!
 
-Our task was to classify preexisting Macleish Field Station trails by as “Easy”, “Moderate”, or “Difficult” according to the length and change in elevation of the trails. The data we used for this purpose was the existing trails shapefile data and 10’ contour elevation data. The former data came from the R package macleish, which included trail names and geometry points, and the latter was downloaded from the MassGIS website, and includes geometry points for elevation lines.
+Our task was to classify preexisting Macleish Field Station trails by as “Easy”, “Moderate”, or “Difficult” according to the length and change in elevation of the trails. The data we used for this purpose was the existing trails shapefile data and 10’ contour elevation data.
 
-We are trying to classify the trails of Macleish Field station as "Easy", "Medium", or "Hard", depending on their length and elevation data. [^1]
+The two datasets we made use of were the trails dataset and the contour elevation dataset. The trail shapefile data came from the R package macleish, which included trail names and geometry points. The contour data was downloaded from the MassGIS website, and includes geometry points for elevation lines. The trails dataset contains 15 observations of four variables, including the names of the trails, while the elevation data was collection of intervals of contour markings along a certain geometry. Both the contours data and the trails data were classified as sf objects. [^1]
 
 
 ```{r, messages = FALSE, warning = FALSE, message=FALSE}
@@ -25,7 +25,7 @@ library(leaflet)
 ```
 
 Find length of each trail, and make sure the crs is correct:
-```{r}
+```{r, warning = FALSE, message=FALSE}
 trails <- st_as_sf(macleish_layers[["trails"]]) %>% 
   mutate(computed_length = st_length(geometry)) %>%
   group_by(name) %>%
@@ -36,7 +36,7 @@ trails_4326 <- trails %>%
 ```
 
 Get contour data: 
-```{r, message =FALSE}
+```{r, warning = FALSE, message=FALSE}
 url <- "http://download.massgis.digital.mass.gov/shapefiles/state/contours250k.zip"
 local_file <- basename(url)
 download.file(url, destfile = local_file)
@@ -52,7 +52,7 @@ contours_elevation <- read_sf(dsn)
 This contour data was retrieved from MassGIS. There is also contour data available in the `macleish` R package. We didn't use the updated package as we already had our code by the time it was included.
 
 Check crs and projections:
-```{r}
+```{r, warning = FALSE, message=FALSE}
 #st_crs(contours_elevation)
 contours_4326 <- st_transform(contours_elevation, 4326)
 #st_crs(contours_4326)
@@ -100,7 +100,7 @@ From testing to see where the trails intersect with the contour lines, we found 
 Based on the length and change in elevation that we calculated above, we made a new data frame that includes the classification for each trail. Trails were marked as "easy" if they had no change in elevation, and were less than 1,000 meters long. Trails were marked as "hard" if they had a change in elevation greater than 50, or a length longer than 5,000. All other trails were classified as "medium".  
 
 Classify each trail:
-```{r, warning=FALSE}
+```{r, warning = FALSE, message=FALSE}
 #function to classify trail difficulty
 classify_fun <- function(data1) {
   data2 <- if (data1$change < 1) {
@@ -142,7 +142,7 @@ Driveway | 0 | 173 | Easy
 
 From this data, the Macleish Field Station can provide visitors with a color-coded map, classifying each trail by how difficult it is. They can also show a map including the elevation data as an informational map to describe the field station location more accurately. 
 
-```{r}
+```{r, warning = FALSE, message=FALSE}
 easy <- trails_4326 %>%
   filter(name == "entry trail" | name == "Easy Out" | name == "Porcupine Trail" | name == "Driveway") 
 medium <- trails_4326 %>%
