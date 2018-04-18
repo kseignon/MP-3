@@ -91,7 +91,7 @@ trail_data_fun <- function(data1, trail_name) {
 #these are the trails that actually intersect with the contour data:
 trail_int_names <- c("Snowmobile Trail", "Eastern Loop", "Vernal Pool Loop", "Poplar Hill Road", "Western Loop", "Porcupine Trail") 
 
-#try with all trails:
+#apply to trails list:
 trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, trail_data_fun)
 ```
 
