@@ -9,9 +9,9 @@ output:
 
 #### Overview
 
-Our task was to classify preexisting Macleish Field Station trails by as “Easy”, “Moderate”, or “Difficult” according to the length and change in elevation of the trails. The data we used for this purpose was the existing trails shapefile data and 10’ contour elevation data. For our project, we marked trails as "Easy" if they had no change in elevation, and were less than 1,000 meters long. We marked trails as "Difficult if they had a change in elevation greater than 50, or a length longer than 5,000. We classified all other trails as "Moderate". This judgment was made according to the range of lengths of our data as well as intuitive reasoning. Our reasoning includes that a trail with no change in elevation would be easiest to hike, and that if a trail does not fall on the two extremes, it should be considered "Moderate".
+Our task was to classify preexisting Macleish Field Station trails by as “Easy”, “Moderate”, or “Difficult” according to the length and change in elevation of the trails. The data we used for this purpose was the existing trails shapefile data and 10’ contour elevation data. For our project, we marked trails as "easy" if they had no change in elevation and were less than 1,000 meters long. We marked trails as "difficult" if they had a change in elevation greater than 50 or a length longer than 5,000. We classified all other trails as "moderate". This judgment was made according to the range of lengths of our data and intuitive reasoning that a trail with no change in elevation would be easiest to hike.
 
-The two datasets we used were the trails dataset and the contour elevation dataset. The trail shapefile data came from the R package macleish, which included trail names and geometry points. The trails dataset contains 15 observations of four variables, including the names of the trails, while the elevation data was collection of intervals of contour markings along a certain geometry. Both the contours data and the trails data were classified as sf objects. [^1]
+The two datasets we made use of were the trails dataset and the contour elevation dataset. The trail shapefile data came from the R package macleish, which included trail names and geometry points. The contour data was downloaded from the MassGIS website and includes geometry points for elevation lines. The trails dataset contains 15 observations of four variables, including the names of the trails, while the elevation data was a collection of intervals of contour markings along a certain geometry. Both the contours data and the trails data were classified as sf objects. [^1]
 
 #### Data wrangling
 
@@ -98,7 +98,7 @@ trail_df_list <- lapply(data1 = macleish_layers[["trails"]], trail_int_names, tr
 
 From testing to see where the trails intersect with the contour lines, we found that six out of ten trails intersect. We thus didn't include the other three trails (entry trail, Easy Out, Driveway) in finding the intersections, and assume their change in elevation is zero.
 
-Based on the length and change in elevation that we calculated above, we made a new data frame that includes the classification for each trail. Trails were marked as "easy" if they had no change in elevation, and were less than 1,000 meters long. Trails were marked as "hard" if they had a change in elevation greater than 50, or a length longer than 5,000. All other trails were classified as "medium".  
+Based on the length and change in elevation that we calculated above, we made a new data frame that includes the classification for each trail. Trails were marked as "easy", "moderate", or "difficult" according to our classification previously described.  
 
 Classify each trail:
 ```{r, warning = FALSE, message=FALSE}
