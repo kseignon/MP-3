@@ -112,7 +112,7 @@ trail_data_fun <- function(data1, trail_name) {
 }
 
 #need to add orig trails geometry
-test <- trail_data_fun(macleish_layers[["trails"]], "Porcupine Trail")
+test <- trail_data_fun(macleish_layers[["trails"]], "Poplar Hill Road")
 left_join(test, st_geometry(macleish_layers[["trails"]]))
 st_join(test, macleish_layers[["trails"]])
 
